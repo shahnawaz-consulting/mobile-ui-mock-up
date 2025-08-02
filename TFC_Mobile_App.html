@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFC Mobile App - Fashion Commerce Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .mobile-container {
+            max-width: 375px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background: white;
+        }
+        .screen {
+            min-height: 100vh;
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .product-card {
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 375px;
+            width: 100%;
+            z-index: 50;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .premium { background: #ffd700; color: #000; }
+        .deluxe { background: #c0c0c0; color: #000; }
+        .elite { background: #cd7f32; color: #fff; }
+        .silver { background: #c0c0c0; color: #000; }
+        .gold { background: #ffd700; color: #000; }
+        .platinum { background: #e5e4e2; color: #000; }
+        .status-tracking {
+            position: relative;
+        }
+        .status-tracking::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 30px;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        .status-active::before {
+            background: #10b981;
+        }
+        @media print {
+            body { font-size: 12px; }
+            .mobile-container { box-shadow: none; max-width: 100%; }
+            .bottom-nav { position: relative; transform: none; left: 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="mobile-container">
+        <!-- Login Screen -->
+        <div id="login" class="screen active">
+            <div class="gradient-bg h-screen flex items-center justify-center p-6">
+                <div class="bg-white rounded-2xl p-8 w-full max-w-sm">
+                    <div class="text-center mb-8">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">TFC</h1>
+                        <p class="text-gray-600">Fashion Commerce Platform</p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email/Mobile</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter email or mobile">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter password">
+                        </div>
+                        
+                        <button onclick="showRoleSelection()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">
+                            Login
+                        </button>
+                        
+                        <div class="text-center">
+                            <button onclick="showScreen('signup')" class="text-blue-600 hover:underline">Create Account</button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button class="text-sm text-gray-500 hover:underline">Login with OTP</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Selection -->
+        <div id="roleSelection" class="screen">
+            <div class="p-6 pt-12">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Select Your Role</h2>
+                <div class="space-y-4">
+                    <button onclick="setRole('consumer')" class="w-full bg-green-100 border-2 border-green-200 rounded-lg p-4 text-left hover:bg-green-200 transition">
+                        <div class="flex items-center">
+                            <i class="fas fa-user text-green-600 text-xl mr-4"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Consumer</h3>
+                                <p class="text-sm text-gray-600">Shop and browse products</p>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="setRole('manufacturer')" class="w-full bg-blue-100 border-2 border-blue-200 rounded-lg p-4 text-left hover:bg-blue-200 transition">
+                        <div class="flex items-center">
+                            <i class="fas fa-industry text-blue-600 text-xl mr-4"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Manufacturer</h3>
+                                <p class="text-sm text-gray-600">Upload and manage catalogs</p>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="setRole('retailer')" class="w-full bg-purple-100 border-2 border-purple-200 rounded-lg p-4 text-left hover:bg-purple-200 transition">
+                        <div class="flex items-center">
+                            <i class="fas fa-store text-purple-600 text-xl mr-4"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Retailer/Trader</h3>
+                                <p class="text-sm text-gray-600">Manage business operations</p>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="setRole('admin')" class="w-full bg-red-100 border-2 border-red-200 rounded-lg p-4 text-left hover:bg-red-200 transition">
+                        <div class="flex items-center">
+                            <i class="fas fa-crown text-red-600 text-xl mr-4"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Super Admin</h3>
+                                <p class="text-sm text-gray-600">System management</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consumer Dashboard -->
+        <div id="consumerDashboard" class="screen">
+            <div class="gradient-bg text-white p-6 pb-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold">Welcome Back!</h2>
+                        <p class="text-blue-100">John Doe</p>
+                        <span class="role-badge premium">King Customer</span>
+                    </div>
+                    <button onclick="showScreen('profile')" class="p-2">
+                        <i class="fas fa-user-circle text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white bg-opacity-20 rounded-lg p-4 text-center">
+                        <i class="fas fa-heart text-2xl mb-2"></i>
+                        <p class="text-sm">Wishlist</p>
+                        <p class="font-bold">12 Items</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-lg p-4 text-center">
+                        <i class="fas fa-shopping-bag text-2xl mb-2"></i>
+                        <p class="text-sm">Orders</p>
+                        <p class="font-bold">5 Active</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 pb-20">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Categories</h3>
+                    <button class="text-blue-600">View All</button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="text-center">
+                        <div class="bg-pink-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-tshirt text-pink-600 text-xl"></i>
+                        </div>
+                        <p class="text-sm font-medium">Apparel</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-gem text-blue-600 text-xl"></i>
+                        </div>
+                        <p class="text-sm font-medium">Jewelry</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-shoe-prints text-green-600 text-xl"></i>
+                        </div>
+                        <p class="text-sm font-medium">Footwear</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Featured Products</h3>
+                    <button onclick="showScreen('catalog')" class="text-blue-600">View All</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="product-card bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="h-40 bg-gray-200 flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400 text-3xl"></i>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-semibold text-gray-800 mb-1">Designer Kurta Set</h4>
+                            <p class="text-sm text-gray-600 mb-2">Premium Collection</p>
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-lg">₹2,499</span>
+                                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                                    <i class="fas fa-heart mr-1"></i>Add to Wishlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manufacturer Dashboard -->
+        <div id="manufacturerDashboard" class="screen">
+            <div class="gradient-bg text-white p-6 pb-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold">Manufacturer Portal</h2>
+                        <p class="text-blue-100">Fashion Industries Ltd.</p>
+                        <span class="role-badge elite">Elite MFR</span>
+                    </div>
+                    <button onclick="showScreen('manufacturerProfile')" class="p-2">
+                        <i class="fas fa-building text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                        <i class="fas fa-box text-xl mb-1"></i>
+                        <p class="text-xs">Catalogs</p>
+                        <p class="font-bold">48</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                        <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                        <p class="text-xs">Orders</p>
+                        <p class="font-bold">156</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                        <i class="fas fa-users text-xl mb-1"></i>
+                        <p class="text-xs">Followers</p>
+                        <p class="font-bold">2.3K</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 pb-20">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button onclick="showScreen('uploadCatalog')" class="bg-blue-600 text-white rounded-lg p-4 text-center">
+                        <i class="fas fa-upload text-2xl mb-2"></i>
+                        <p class="font-medium">Upload Catalog</p>
+                    </button>
+                    <button onclick="showScreen('manageUsers')" class="bg-green-600 text-white rounded-lg p-4 text-center">
+                        <i class="fas fa-user-cog text-2xl mb-2"></i>
+                        <p class="font-medium">Manage Users</p>
+                    </button>
+                </div>
+                
+                <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
+                <div class="space-y-3">
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-gray-800">New Order #TFC-001</p>
+                                <p class="text-sm text-gray-600">Designer Saree Collection</p>
+                                <p class="text-xs text-gray-500">2 hours ago</p>
+                            </div>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">New</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-gray-800">Access Request</p>
+                                <p class="text-sm text-gray-600">Fashion Hub Store</p>
+                                <p class="text-xs text-gray-500">5 hours ago</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="bg-green-600 text-white px-3 py-1 rounded text-xs">Accept</button>
+                                <button class="bg-red-600 text-white px-3 py-1 rounded text-xs">Deny</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Retailer Dashboard -->
+        <div id="retailerDashboard" class="screen">
+            <div class="gradient-bg text-white p-6 pb-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold">Retailer Portal</h2>
+                        <p class="text-blue-100">Fashion Retail Co.</p>
+                        <span class="role-badge gold">Gold Business</span>
+                    </div>
+                    <button onclick="showScreen('retailerProfile')" class="p-2">
+                        <i class="fas fa-store text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                        <i class="fas fa-chart-line text-xl mb-1"></i>
+                        <p class="text-xs">Sales</p>
+                        <p class="font-bold">₹2.4L</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                        <i class="fas fa-box-open text-xl mb-1"></i>
+                        <p class="text-xs">Orders</p>
+                        <p class="font-bold">89</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                        <i class="fas fa-user-tie text-xl mb-1"></i>
+                        <p class="text-xs">Customers</p>
+                        <p class="font-bold">450</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 pb-20">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button onclick="showScreen('businessVerification')" class="bg-orange-600 text-white rounded-lg p-4 text-center">
+                        <i class="fas fa-certificate text-2xl mb-2"></i>
+                        <p class="font-medium">Verification</p>
+                    </button>
+                    <button onclick="showScreen('customization')" class="bg-purple-600 text-white rounded-lg p-4 text-center">
+                        <i class="fas fa-palette text-2xl mb-2"></i>
+                        <p class="font-medium">Customization</p>
+                    </button>
+                </div>
+                
+                <h3 class="text-lg font-semibold mb-4">Sales Funnel</h3>
+                <div class="space-y-4">
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-medium">Leads</h4>
+                            <span class="text-2xl font-bold text-blue-600">124</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: 70%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-medium">Prospects</h4>
+                            <span class="text-2xl font-bold text-green-600">87</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: 55%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-medium">Customers</h4>
+                            <span class="text-2xl font-bold text-purple-600">56</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-600 h-2 rounded-full" style="width: 40%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="screen">
+            <div class="gradient-bg text-white p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold">Super Admin</h2>
+                        <p class="text-blue-100">System Control Panel</p>
+                    </div>
+                    <i class="fas fa-crown text-2xl"></i>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white bg-opacity-20 rounded-lg p-4 text-center">
+                        <i class="fas fa-users text-2xl mb-2"></i>
+                        <p class="text-sm">Total Users</p>
+                        <p class="font-bold text-lg">12,456</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-lg p-4 text-center">
+                        <i class="fas fa-chart-bar text-2xl mb-2"></i>
+                        <p class="text-sm">Revenue</p>
+                        <p class="font-bold text-lg">₹45.2L</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 pb-20">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button onclick="showScreen('systemManage')" class="bg-red-600 text-white rounded-lg p-4 text-center">
+                        <i class="fas fa-cogs text-2xl mb-2"></i>
+                        <p class="font-medium">System Manage</p>
+                    </button>
+                    <button onclick="showScreen('reports')" class="bg-indigo-600 text-white rounded-lg p-4 text-center">
+                        <i class="fas fa-chart-pie text-2xl mb-2"></i>
+                        <p class="font-medium">Reports</p>
+                    </button>
+                </div>
+                
+                <h3 class="text-lg font-semibold mb-4">Account Management</h3>
+                <div class="space-y-3">
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">Manufacturer Verification</p>
+                                <p class="text-sm text-gray-600">Fashion Industries Ltd.</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="bg-green-600 text-white px-3 py-1 rounded text-xs">Approve</button>
+                                <button class="bg-red-600 text-white px-3 py-1 rounded text-xs">Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">Business Upgrade Request</p>
+                                <p class="text-sm text-gray-600">Premium to Elite</p>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Catalog -->
+        <div id="catalog" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold flex-1">Catalog</h2>
+                <button onclick="showScreen('search')">
+                    <i class="fas fa-search text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 pb-20">
+                <div class="flex space-x-2 mb-4 overflow-x-auto">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm whitespace-nowrap">All</button>
+                    <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Apparel</button>
+                    <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Jewelry</button>
+                    <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Footwear</button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div onclick="showScreen('productDetail')" class="product-card bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer">
+                        <div class="h-32 bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center">
+                            <i class="fas fa-tshirt text-pink-400 text-2xl"></i>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm mb-1">Designer Kurta</h4>
+                            <p class="text-xs text-gray-600 mb-2">Cotton Blend</p>
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm">₹1,299</span>
+                                <button class="text-red-500">
+                                    <i class="fas fa-heart text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div onclick="showScreen('productDetail')" class="product-card bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer">
+                        <div class="h-32 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                            <i class="fas fa-gem text-blue-400 text-2xl"></i>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm mb-1">Silver Necklace</h4>
+                            <p class="text-xs text-gray-600 mb-2">Premium Quality</p>
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm">₹3,499</span>
+                                <button class="text-gray-400">
+                                    <i class="far fa-heart text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div onclick="showScreen('productDetail')" class="product-card bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer">
+                        <div class="h-32 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+                            <i class="fas fa-shoe-prints text-green-400 text-2xl"></i>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm mb-1">Casual Shoes</h4>
+                            <p class="text-xs text-gray-600 mb-2">Leather</p>
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm">₹2,999</span>
+                                <button class="text-gray-400">
+                                    <i class="far fa-heart text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div onclick="showScreen('productDetail')" class="product-card bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer">
+                        <div class="h-32 bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center">
+                            <i class="fas fa-tshirt text-purple-400 text-2xl"></i>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm mb-1">Party Dress</h4>
+                            <p class="text-xs text-gray-600 mb-2">Silk Blend</p>
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm">₹4,999</span>
+                                <button class="text-gray-400">
+                                    <i class="far fa-heart text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail -->
+        <div id="productDetail" class="screen">
+            <div class="relative">
+                <div class="h-80 bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center">
+                    <i class="fas fa-tshirt text-pink-400 text-6xl"></i>
+                </div>
+                <button onclick="goBack()" class="absolute top-4 left-4 bg-white rounded-full p-2 shadow-lg">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button class="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg text-red-500">
+                    <i class="fas fa-heart"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 pb-20">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Designer Kurta Set</h2>
+                        <p class="text-gray-600">Premium Cotton Collection</p>
+                        <div class="flex items-center mt-2">
+                            <div class="flex text-yellow-400 mr-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-sm text-gray-600">(4.2) 156 reviews</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-3xl font-bold text-gray-800">₹2,499</span>
+                        <p class="text-sm text-gray-500 line-through">₹3,499</p>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="font-semibold mb-3">Size</h3>
+                    <div class="flex space-x-3">
+                        <button class="border-2 border-blue-600 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg font-medium">S</button>
+                        <button class="border-2 border-gray-300 px-4 py-2 rounded-lg font-medium">M</button>
+                        <button class="border-2 border-gray-300 px-4 py-2 rounded-lg font-medium">L</button>
+                        <button class="border-2 border-gray-300 px-4 py-2 rounded-lg font-medium">XL</button>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="font-semibold mb-3">Color</h3>
+                    <div class="flex space-x-3">
+                        <button class="w-8 h-8 bg-red-500 rounded-full border-2 border-gray-300"></button>
+                        <button class="w-8 h-8 bg-blue-500 rounded-full border-4 border-blue-200"></button>
+                        <button class="w-8 h-8 bg-green-500 rounded-full border-2 border-gray-300"></button>
+                        <button class="w-8 h-8 bg-yellow-500 rounded-full border-2 border-gray-300"></button>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="font-semibold mb-3">Description</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Premium quality designer kurta set made from 100% cotton. Perfect for festive occasions and special events. Features intricate embroidery work and comfortable fit.
+                    </p>
+                </div>
+                
+                <div class="mb-6">
+                    <button onclick="showScreen('customization')" class="w-full bg-purple-100 text-purple-700 py-3 rounded-lg font-medium mb-3">
+                        <i class="fas fa-palette mr-2"></i>Customize This Product
+                    </button>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button onclick="showScreen('cart')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium">
+                        <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
+                    </button>
+                    <button class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium">
+                        <i class="fas fa-bolt mr-2"></i>Buy Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shopping Cart -->
+        <div id="cart" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold flex-1">Shopping Cart</h2>
+                <span class="bg-red-600 text-white px-2 py-1 rounded-full text-xs">3</span>
+            </div>
+            
+            <div class="p-4 pb-32">
+                <div class="space-y-4 mb-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 bg-pink-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-tshirt text-pink-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium mb-1">Designer Kurta Set</h4>
+                                <p class="text-sm text-gray-600 mb-2">Size: M, Color: Blue</p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center border rounded-lg">
+                                        <button class="px-3 py-1">-</button>
+                                        <span class="px-3 py-1 border-x">1</span>
+                                        <button class="px-3 py-1">+</button>
+                                    </div>
+                                    <span class="font-bold">₹2,499</span>
+                                </div>
+                            </div>
+                            <button class="ml-4 text-red-500">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-gem text-blue-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium mb-1">Silver Necklace</h4>
+                                <p class="text-sm text-gray-600 mb-2">Premium Quality</p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center border rounded-lg">
+                                        <button class="px-3 py-1">-</button>
+                                        <span class="px-3 py-1 border-x">2</span>
+                                        <button class="px-3 py-1">+</button>
+                                    </div>
+                                    <span class="font-bold">₹6,998</span>
+                                </div>
+                            </div>
+                            <button class="ml-4 text-red-500">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                    <h3 class="font-semibold mb-3">Apply Coupon</h3>
+                    <div class="flex space-x-2">
+                        <input type="text" placeholder="Enter coupon code" class="flex-1 px-3 py-2 border rounded-lg">
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg">Apply</button>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 rounded-lg p-4 mb-6">
+                    <h3 class="font-semibold text-green-800 mb-2">
+                        <i class="fas fa-gift mr-2"></i>Special Offer
+                    </h3>
+                    <p class="text-sm text-green-700">Buy 2 get 1 free on selected items!</p>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <h3 class="font-semibold mb-3">Order Summary</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>Subtotal</span>
+                            <span>₹9,497</span>
+                        </div>
+                        <div class="flex justify-between text-green-600">
+                            <span>Discount</span>
+                            <span>-₹500</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Shipping</span>
+                            <span>₹99</span>
+                        </div>
+                        <div class="border-t pt-2 flex justify-between font-bold text-lg">
+                            <span>Total</span>
+                            <span>₹9,096</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-white border-t p-4">
+                <button onclick="showScreen('checkout')" class="w-full bg-green-600 text-white py-3 rounded-lg font-medium">
+                    <i class="fas fa-credit-card mr-2"></i>Proceed to Checkout
+                </button>
+            </div>
+        </div>
+
+        <!-- Checkout -->
+        <div id="checkout" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold">Checkout</h2>
+            </div>
+            
+            <div class="p-4 pb-32">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Shipping Address</h3>
+                        <div class="space-y-3">
+                            <input type="text" placeholder="Full Name" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="Mobile Number" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="Address Line 1" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="Address Line 2" class="w-full px-3 py-2 border rounded-lg">
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" placeholder="City" class="px-3 py-2 border rounded-lg">
+                                <input type="text" placeholder="PIN Code" class="px-3 py-2 border rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Payment Method</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="payment" class="mr-3" checked>
+                                <i class="fas fa-credit-card mr-2 text-blue-600"></i>
+                                <span>Credit/Debit Card</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="payment" class="mr-3">
+                                <i class="fab fa-google-pay mr-2 text-green-600"></i>
+                                <span>UPI/Google Pay</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="payment" class="mr-3">
+                                <i class="fas fa-university mr-2 text-purple-600"></i>
+                                <span>Net Banking</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="payment" class="mr-3">
+                                <i class="fas fa-money-bill mr-2 text-orange-600"></i>
+                                <span>Cash on Delivery</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Order Summary</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Items (3)</span>
+                                <span>₹9,497</span>
+                            </div>
+                            <div class="flex justify-between text-green-600">
+                                <span>Discount</span>
+                                <span>-₹500</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Shipping</span>
+                                <span>₹99</span>
+                            </div>
+                            <div class="border-t pt-2 flex justify-between font-bold text-lg">
+                                <span>Total Amount</span>
+                                <span>₹9,096</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-white border-t p-4">
+                <button onclick="showScreen('orderTracking')" class="w-full bg-green-600 text-white py-3 rounded-lg font-medium">
+                    <i class="fas fa-lock mr-2"></i>Place Order - ₹9,096
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Tracking -->
+        <div id="orderTracking" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold">Order Tracking</h2>
+            </div>
+            
+            <div class="p-4 pb-20">
+                <div class="bg-green-50 rounded-lg p-4 mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-600 text-2xl mr-3"></i>
+                        <div>
+                            <h3 class="font-semibold text-green-800">Order Confirmed!</h3>
+                            <p class="text-sm text-green-700">Order #TFC-2024-001</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <h3 class="font-semibold mb-4">Tracking Status</h3>
+                    <div class="status-tracking space-y-4">
+                        <div class="flex items-center status-active">
+                            <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-sm mr-4">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Order Confirmed</p>
+                                <p class="text-xs text-gray-600">Payment successful</p>
+                                <p class="text-xs text-gray-500">Today, 2:30 PM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center status-active">
+                            <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-sm mr-4">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Quality Check</p>
+                                <p class="text-xs text-gray-600">Items verified for quality</p>
+                                <p class="text-xs text-gray-500">Today, 4:15 PM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm mr-4">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Package Ready</p>
+                                <p class="text-xs text-gray-600">Ready for shipment</p>
+                                <p class="text-xs text-gray-500">In Progress</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm mr-4">
+                                <i class="fas fa-shipping-fast"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-600">Shipped</p>
+                                <p class="text-xs text-gray-500">Courier on route</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm mr-4">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-600">Delivered</p>
+                                <p class="text-xs text-gray-500">Package delivered</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <h3 class="font-semibold mb-3">Order Details</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-pink-100 rounded mr-3 flex items-center justify-center">
+                                <i class="fas fa-tshirt text-pink-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm">Designer Kurta Set</p>
+                                <p class="text-xs text-gray-600">Size: M, Color: Blue</p>
+                            </div>
+                            <span class="text-sm font-medium">₹2,499</span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded mr-3 flex items-center justify-center">
+                                <i class="fas fa-gem text-blue-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm">Silver Necklace (2x)</p>
+                                <p class="text-xs text-gray-600">Premium Quality</p>
+                            </div>
+                            <span class="text-sm font-medium">₹6,998</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <button onclick="showScreen('returns')" class="w-full bg-red-100 text-red-700 py-3 rounded-lg font-medium">
+                        <i class="fas fa-undo mr-2"></i>Return/Refund Request
+                    </button>
+                    <button class="w-full bg-blue-100 text-blue-700 py-3 rounded-lg font-medium">
+                        <i class="fas fa-phone mr-2"></i>Contact Support
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Returns & Refunds -->
+        <div id="returns" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold">Returns & Refunds</h2>
+            </div>
+            
+            <div class="p-4 pb-20">
+                <div class="bg-yellow-50 rounded-lg p-4 mb-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-info-circle text-yellow-600 text-xl mr-3 mt-1"></i>
+                        <div>
+                            <h3 class="font-semibold text-yellow-800">Return Policy</h3>
+                            <p class="text-sm text-yellow-700 mt-1">Returns accepted within 7 days of delivery. Items must be in original condition.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <h3 class="font-semibold mb-4">Select Return Reason</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="radio" name="return-reason" class="mr-3">
+                            <div>
+                                <p class="font-medium">Manufacturing Defect</p>
+                                <p class="text-xs text-gray-600">Product has manufacturing issues</p>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center">
+                            <input type="radio" name="return-reason" class="mr-3">
+                            <div>
+                                <p class="font-medium">Wrong Item Received</p>
+                                <p class="text-xs text-gray-600">Different product than ordered</p>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center">
+                            <input type="radio" name="return-reason" class="mr-3">
+                            <div>
+                                <p class="font-medium">Transit Damage</p>
+                                <p class="text-xs text-gray-600">Item damaged during shipping</p>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center">
+                            <input type="radio" name="return-reason" class="mr-3">
+                            <div>
+                                <p class="font-medium">Incomplete Order</p>
+                                <p class="text-xs text-gray-600">Missing items from order</p>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center">
+                            <input type="radio" name="return-reason" class="mr-3">
+                            <div>
+                                <p class="font-medium">Not Satisfied</p>
+                                <p class="text-xs text-gray-600">Product doesn't meet expectations</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <h3 class="font-semibold mb-3">Select Items to Return</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-3">
+                            <div class="w-12 h-12 bg-pink-100 rounded mr-3 flex items-center justify-center">
+                                <i class="fas fa-tshirt text-pink-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm">Designer Kurta Set</p>
+                                <p class="text-xs text-gray-600">Size: M, Color: Blue</p>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-3">
+                            <div class="w-12 h-12 bg-blue-100 rounded mr-3 flex items-center justify-center">
+                                <i class="fas fa-gem text-blue-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-sm">Silver Necklace</p>
+                                <p class="text-xs text-gray-600">Premium Quality (Qty: 2)</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <h3 class="font-semibold mb-3">Additional Comments</h3>
+                    <textarea placeholder="Describe the issue in detail..." class="w-full px-3 py-2 border rounded-lg h-24 resize-none"></textarea>
+                </div>
+                
+                <button class="w-full bg-red-600 text-white py-3 rounded-lg font-medium">
+                    <i class="fas fa-paper-plane mr-2"></i>Submit Return Request
+                </button>
+            </div>
+        </div>
+
+        <!-- Upload Catalog (Manufacturer) -->
+        <div id="uploadCatalog" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold">Upload Catalog</h2>
+            </div>
+            
+            <div class="p-4 pb-20">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Product Information</h3>
+                        <div class="space-y-3">
+                            <input type="text" placeholder="SKU Code" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="Product Name" class="w-full px-3 py-2 border rounded-lg">
+                            <select class="w-full px-3 py-2 border rounded-lg">
+                                <option>Select Category</option>
+                                <option>Apparel</option>
+                                <option>Jewelry</option>
+                                <option>Footwear</option>
+                                <option>Accessories</option>
+                            </select>
+                            <input type="text" placeholder="Size (S,M,L,XL)" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="Available Colors" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="Fabric/Material" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Pricing & Quantity</h3>
+                        <div class="space-y-3">
+                            <input type="number" placeholder="Price (₹)" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="number" placeholder="MOQ (Minimum Order Quantity)" class="w-full px-3 py-2 border rounded-lg">
+                            <textarea placeholder="Product Description" class="w-full px-3 py-2 border rounded-lg h-24 resize-none"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Product Images</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-600">Tap to upload images</p>
+                            <p class="text-xs text-gray-500">Max 5 images, 2MB each</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Additional Options</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Allow Customization</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Custom Order Available</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Make to Order</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Source Fabric Option</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Broadcast Settings</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="broadcast" class="mr-3" checked>
+                                <span>Followers Only</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="broadcast" class="mr-3">
+                                <span>All Users</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="broadcast" class="mr-3">
+                                <span>Private (Access Request Required)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <button class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium">
+                            <i class="fas fa-upload mr-2"></i>Upload Catalog
+                        </button>
+                        <button class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-medium">
+                            <i class="fas fa-save mr-2"></i>Save as Draft
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management -->
+        <div id="manageUsers" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold">User Management</h2>
+                <button onclick="showScreen('addUser')" class="ml-auto text-blue-600">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 pb-20">
+                <div class="space-y-4">
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-user text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">John Designer</p>
+                                    <p class="text-sm text-gray-600">Designer Department</p>
+                                    <p class="text-xs text-gray-500">john@company.com</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Active</span>
+                                <div class="flex space-x-2 mt-2">
+                                    <button class="text-blue-600 text-sm">Edit</button>
+                                    <button class="text-red-600 text-sm">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 pt-3 border-t">
+                            <h4 class="text-sm font-medium mb-2">Permissions:</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Upload</span>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Inventory</span>
+                                <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Customization</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-user text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Sarah Merchandiser</p>
+                                    <p class="text-sm text-gray-600">Merchandiser</p>
+                                    <p class="text-xs text-gray-500">sarah@company.com</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Active</span>
+                                <div class="flex space-x-2 mt-2">
+                                    <button class="text-blue-600 text-sm">Edit</button>
+                                    <button class="text-red-600 text-sm">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 pt-3 border-t">
+                            <h4 class="text-sm font-medium mb-2">Permissions:</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">Catalog Request</span>
+                                <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">Wishlist</span>
+                                <span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-xs">Orders</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-user text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Mike Storekeeper</p>
+                                    <p class="text-sm text-gray-600">Storekeeper</p>
+                                    <p class="text-xs text-gray-500">mike@company.com</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Pending</span>
+                                <div class="flex space-x-2 mt-2">
+                                    <button class="text-blue-600 text-sm">Edit</button>
+                                    <button class="text-red-600 text-sm">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 pt-3 border-t">
+                            <h4 class="text-sm font-medium mb-2">Permissions:</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Inventory</span>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Logistics</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add User -->
+        <div id="addUser" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold">Add New User</h2>
+            </div>
+            
+            <div class="p-4 pb-20">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Personal Information</h3>
+                        <div class="space-y-3">
+                            <input type="text" placeholder="Full Name" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="email" placeholder="Email Address" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="tel" placeholder="Mobile Number" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="date" placeholder="Date of Birth" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="Identity (Aadhar/PAN)" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Role & Department</h3>
+                        <div class="space-y-3">
+                            <select class="w-full px-3 py-2 border rounded-lg">
+                                <option>Select Department</option>
+                                <option>Designer</option>
+                                <option>Merchandiser</option>
+                                <option>Storekeeper</option>
+                                <option>Accounts</option>
+                                <option>Admin</option>
+                            </select>
+                            <select class="w-full px-3 py-2 border rounded-lg">
+                                <option>Select Role</option>
+                                <option>Junior</option>
+                                <option>Senior</option>
+                                <option>Lead</option>
+                                <option>Manager</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">User Permissions</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Upload Catalog/Collection</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Manage Inventory</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Process Orders</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Handle Logistics</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Business Requests (Accept/Deny)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>User Management</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-3">
+                                <span>Customization Requests</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <button class="w-full bg-green-600 text-white py-3 rounded-lg font-medium">
+                            <i class="fas fa-user-plus mr-2"></i>Add User
+                        </button>
+                        <button class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-medium">
+                            <i class="fas fa-paper-plane mr-2"></i>Send Invitation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Verification -->
+        <div id="businessVerification" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold">Business Verification</h2>
+            </div>
+            
+            <div class="p-4 pb-20">
+                <div class="bg-yellow-50 rounded-lg p-4 mb-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 text-xl mr-3 mt-1"></i>
+                        <div>
+                            <h3 class="font-semibold text-yellow-800">Verification Required</h3>
+                            <p class="text-sm text-yellow-700 mt-1">Complete business verification to unlock premium features</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Business Information</h3>
+                        <div class="space-y-3">
+                            <input type="text" placeholder="Registered Business Name" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="GST Number" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="tel" placeholder="Company Mobile Number" class="w-full px-3 py-2 border rounded-lg">
+                            <textarea placeholder="Registered Address" class="w-full px-3 py-2 border rounded-lg h-20 resize-none"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Business Type</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="business-type" class="mr-3">
+                                <span>Sole Proprietorship</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="business-type" class="mr-3">
+                                <span>Partnership</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="business-type" class="mr-3">
+                                <span>Private Limited Company</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="business-type" class="mr-3">
+                                <span>Limited Liability Partnership (LLP)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Banking Information</h3>
+                        <div class="space-y-3">
+                            <input type="text" placeholder="Bank Name" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="Account Number" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="IFSC Code" class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" placeholder="Account Holder Name" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Document Upload</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">GST Certificate</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                    <i class="fas fa-file-upload text-2xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-600">Upload GST Certificate</p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Business Registration</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                    <i class="fas fa-file-upload text-2xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-600">Upload Registration Document</p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Partnership Deed (if applicable)</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                    <i class="fas fa-file-upload text-2xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-600">Upload Partnership Deed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full bg-green-600 text-white py-3 rounded-lg font-medium">
+                        <i class="fas fa-check-circle mr-2"></i>Submit for Verification
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customization -->
+        <div id="customization" class="screen">
+            <div class="bg-white border-b p-4 flex items-center">
+                <button onclick="goBack()" class="mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="text-lg font-semibold">Customization Request</h2>
+            </div>
+            
+            <div class="p-4 pb-20">
+                <div class="bg-purple-50 rounded-lg p-4 mb-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-palette text-purple-600 text-xl mr-3 mt-1"></i>
+                        <div>
+                            <h3 class="font-semibold text-purple-800">Custom Design Service</h3>
+                            <p class="text-sm text-purple-700 mt-1">Create personalized products with our expert designers</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Product Selection</h3>
+                        <div class="flex items-center mb-4">
+                            <div class="w-16 h-16 bg-pink-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-tshirt text-pink-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Designer Kurta Set</h4>
+                                <p class="text-sm text-gray-600">Premium Cotton Collection</p>
+                                <p class="text-sm font-medium text-green-600">Customization Available</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Customization Type</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="custom-type" class="mr-3" checked>
+                                <div>
+                                    <p class="font-medium">Design Modification</p>
+                                    <p class="text-xs text-gray-600">Change colors, patterns, or embroidery</p>
+                                </div>
+                            </label>
+                            
+                            <label class="flex items-center">
+                                <input type="radio" name="custom-type" class="mr-3">
+                                <div>
+                                    <p class="font-medium">Size Alteration</p>
+                                    <p class="text-xs text-gray-600">Custom measurements and fit</p>
+                                </div>
+                            </label>
+                            
+                            <label class="flex items-center">
+                                <input type="radio" name="custom-type" class="mr-3">
+                                <div>
+                                    <p class="font-medium">Fabric Change</p>
+                                    <p class="text-xs text-gray-600">Different material or texture</p>
+                                </div>
+                            </label>
+                            
+                            <label class="flex items-center">
+                                <input type="radio" name="custom-type" class="mr-3">
+                                <div>
+                                    <p class="font-medium">Complete Custom Design</p>
+                                    <p class="text-xs text-gray-600">Brand new design from scratch</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Quantity & Requirements</h3>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="number" placeholder="Quantity" class="px-3 py-2 border rounded-lg">
+                                <input type="text" placeholder="Size Range" class="px-3 py-2 border rounded-lg">
+                            </div>
+                            <textarea placeholder="Detailed requirements and specifications..." class="w-full px-3 py-2 border rounded-lg h-24 resize-none"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Reference Images</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                            <i class="fas fa-images text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-600">Upload reference images</p>
+                            <p class="text-xs text-gray-500">Max 3 images, 2MB each</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Timeline & Budget</h3>
+                        <div class="space-y-3">
+                            <select class="w-full px-3 py-2 border rounded-lg">
+                                <option>Expected Timeline</option>
+                                <option>7-10 days</option>
+                                <option>2-3 weeks</option>
+                                <option>1 month</option>
+                                <option>Flexible</option>
+                            </select>
+                            <select class="w-full px-3 py-2 border rounded-lg">
+                                <option>Budget Range</option>
+                                <option>Under ₹5,000</option>
+                                <option>₹5,000 - ₹10,000</option>
+                                <option>₹10,000 - ₹25,000</option>
+                                <option>Above ₹25,000</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full bg-purple-600 text-white py-3 rounded-lg font-medium">
+                        <i class="fas fa-paper-plane mr-2"></i>Submit Customization Request
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profile" class="screen">
+            <div class="gradient-bg text-white p-6">
+                <div class="flex items-center mb-6">
+                    <button onclick="goBack()" class="mr-4">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </button>
+                    <h2 class="text-xl font-semibold">Profile</h2>
+                </div>
+                
+                <div class="text-center mb-6">
+                    <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-user text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">John Doe</h3>
+                    <p class="text-blue-100">john.doe@email.com</p>
+                    <span class="role-badge premium mt-2">King Customer</span>
+                </div>
+            </div>
+            
+            <div class="p-4 pb-20">
+                <div class="space-y-4">
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Personal Information</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Name</span>
+                                <span class="font-medium">John Doe</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Email</span>
+                                <span class="font-medium">john.doe@email.com</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Mobile</span>
+                                <span class="font-medium">+91 98765 43210</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Date of Birth</span>
+                                <span class="font-medium">15/08/1990</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-100 text-blue-700 py-2 rounded-lg font-medium mt-4">
+                            <i class="fas fa-edit mr-2"></i>Edit Profile
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Address</h3>
+                        <div class="text-sm text-gray-600 leading-relaxed">
+                            <p>123 Fashion Street</p>
+                            <p>Commerce Plaza, 2nd Floor</p>
+                            <p>Mumbai, Maharashtra 400001</p>
+                        </div>
+                        <button class="w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-medium mt-3">
+                            <i class="fas fa-map-marker-alt mr-2"></i>Manage Addresses
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold mb-3">Account Settings</h3>
+                        <div class="space-y-3">
+                            <button class="w-full text-left py-2 flex items-center justify-between">
+                                <span><i class="fas fa-bell mr-3 text-gray-400"></i>Notifications</span>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </button>
+                            <button class="w-full text-left py-2 flex items-center justify-between">
+                                <span><i class="fas fa-lock mr-3 text-gray-400"></i>Change Password</span>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </button>
+                            <button class="w-full text-left py-2 flex items-center justify-between">
+                                <span><i class="fas fa-shield-alt mr-3 text-gray-400"></i>Privacy Settings</span>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button onclick="showScreen('login')" class="w-full bg-red-100 text-red-700 py-3 rounded-lg font-medium">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav bg-white border-t">
+            <div class="flex justify-around py-2">
+                <button onclick="showDashboard()" class="flex flex-col items-center py-2 px-3">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <span class="text-xs">Home</span>
+                </button>
+                <button onclick="showScreen('catalog')" class="flex flex-col items-center py-2 px-3">
+                    <i class="fas fa-th-large text-xl mb-1"></i>
+                    <span class="text-xs">Catalog</span>
+                </button>
+                <button onclick="showScreen('cart')" class="flex flex-col items-center py-2 px-3 relative">
+                    <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                    <span class="text-xs">Cart</span>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                </button>
+                <button onclick="showScreen('orderTracking')" class="flex flex-col items-center py-2 px-3">
+                    <i class="fas fa-truck text-xl mb-1"></i>
+                    <span class="text-xs">Orders</span>
+                </button>
+                <button onclick="showScreen('profile')" class="flex flex-col items-center py-2 px-3">
+                    <i class="fas fa-user text-xl mb-1"></i>
+                    <span class="text-xs">Profile</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRole = 'consumer';
+        let previousScreen = null;
+        
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show target screen
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                previousScreen = document.querySelector('.screen.active')?.id || screenId;
+            }
+        }
+        
+        function showRoleSelection() {
+            showScreen('roleSelection');
+        }
+        
+        function setRole(role) {
+            currentRole = role;
+            showDashboard();
+        }
+        
+        function showDashboard() {
+            switch(currentRole) {
+                case 'consumer':
+                    showScreen('consumerDashboard');
+                    break;
+                case 'manufacturer':
+                    showScreen('manufacturerDashboard');
+                    break;
+                case 'retailer':
+                    showScreen('retailerDashboard');
+                    break;
+                case 'admin':
+                    showScreen('adminDashboard');
+                    break;
+                default:
+                    showScreen('consumerDashboard');
+            }
+        }
+        
+        function goBack() {
+            // Simple back functionality - can be enhanced with proper navigation stack
+            switch(currentRole) {
+                case 'consumer':
+                    showScreen('consumerDashboard');
+                    break;
+                case 'manufacturer':
+                    showScreen('manufacturerDashboard');
+                    break;
+                case 'retailer':
+                    showScreen('retailerDashboard');
+                    break;
+                case 'admin':
+                    showScreen('adminDashboard');
+                    break;
+                default:
+                    showScreen('consumerDashboard');
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showScreen('login');
+        });
+    </script>
+</body>
+</html>
